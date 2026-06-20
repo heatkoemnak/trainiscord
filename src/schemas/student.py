@@ -1,16 +1,32 @@
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 
 
-class StudentCreate(BaseModel):
+class StudentBase(BaseModel):
     name: str
     email: str
-    gender: str
-    company_name: str | None = None
-    status: str | None = None
-    term_id: int
+    gender: Optional[str] = None
+    company_name: Optional[str] = None
+    status: Optional[str] = None
+    enrolled_at: Optional[date] = None
 
 
-class StudentResponse(StudentCreate):
+class StudentCreate(StudentBase):
+    pass
+
+
+class StudentUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    gender: Optional[str] = None
+    company_name: Optional[str] = None
+    status: Optional[str] = None
+    enrolled_at: Optional[date] = None
+
+
+class StudentOut(StudentBase):
     id: int
-    enrolled_at: date
+
+    class Config:
+        from_attributes = True

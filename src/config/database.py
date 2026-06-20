@@ -1,19 +1,16 @@
-import psycopg
-from psycopg.rows import dict_row
-from src.config.settings import settings
+import os
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-def get_db():
-    conn = psycopg.connect(
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        dbname=settings.DB_NAME,
-        user=settings.DB_USER,
-        password=settings.DB_PASSWORD,
-        row_factory=dict_row,
-    )
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-    try:
-        yield conn
-    finally:
-        conn.close()
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+Base = declarative_base()

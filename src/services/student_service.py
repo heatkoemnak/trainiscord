@@ -1,74 +1,47 @@
+from sqlalchemy.orm import Session
+from src.models.student import Student
+from src.schemas.student import StudentCreate, StudentUpdate
+
+
 class StudentService:
 
     @staticmethod
-    def get_all(conn):
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT 
-                    s.id AS student_id,
-                    s.name AS student_name,
-                    s.email,
-                    s.gender,
-                    s.company_name,
-                    s.status,
-                    s.enrolled_at,
+    def get_all(db: Session):
+        return db.query(Student).all()
 
-                    t.id AS term_id,
-                    t.name AS term_name,
-                    t.start_date,
-                    t.end_date,
-                    t.duration
-
-                FROM students s
-                LEFT JOIN terms t ON s.term_id = t.id
-                ORDER BY s.id
-            """)
-            return cur.fetchall()
     @staticmethod
-    def create(conn, data):
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO students
-                (name,email,gender,company_name,status,term_id)
-                VALUES (%s,%s,%s,%s,%s,%s)
-                RETURNING *
-            """, (
-                data.name,
-                data.email,
-                data.gender,
-                data.company_name,
-                data.status,
-                data.term_id
-            ))
+    def get_by_id(db: Session, student_id: int):
+        return db.query(Student).filter(Student.id == student_id).first()
 
-            conn.commit()
-            return cur.fetchone()
-        
     @staticmethod
-    def update(conn, student_id: int, data):
-        with conn.cursor() as cur:
-            cur.execute("""
-                UPDATE students
-                SET 
-                    name = %s,
-                    email = %s,
-                    gender = %s,
-                    company_name = %s,
-                    status = %s,
-                    term_id = %s
-                WHERE id = %s
-                RETURNING *
-            """, (
-                data.name,
-                data.email,
-                data.gender,
-                data.company_name,
-                data.status,
-                data.term_id,
-                student_id
-            ))
+    def create(db: Session, data: StudentCreate):
+        student = Student(**data.model_dump())
+        db.add(student)
+        db.commit()
+        db.refresh(student)
+        return student
 
-            updated_student = cur.fetchone()
-            conn.commit()
+    @staticmethod
+    def update(db: Session, student_id: int, data: StudentUpdate):
+        student = db.query(Student).filter(Student.id == student_id).first()
 
-            return updated_student
+        if not student:
+            return None
+
+        for key, value in data.model_dump(exclude_unset=True).items():
+            setattr(student, key, value)
+
+        db.commit()
+        db.refresh(student)
+        return student
+
+    @staticmethod
+    def delete(db: Session, student_id: int):
+        student = db.query(Student).filter(Student.id == student_id).first()
+
+        if not student:
+            return False
+
+        db.delete(student)
+        db.commit()
+        return True
