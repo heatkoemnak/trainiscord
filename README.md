@@ -1,39 +1,52 @@
 
 # uv command
 
-python -m uvicorn main:app --reload
+Requirements to run this project:
 
-Commands Used in the Video:
+1. Make sure you have Docker installed on your machine.
+2. You have Git/Bash installed on your machine.
 
-## Step 1: Pull PostgreSQL Image
-docker pull postgres  
+Get Started
 
-## Step 2: Run PostgreSQL Container
-docker run --name pg-tutorial -e POSTGRES_PASSWORD=mysecurepassword -p 5432:5432 -d postgres 
- 
-## Step 3: Verify PostgreSQL Container is Running
-docker ps  
+### Step 1: Clone this project onto your local directory on your machine.
+git clone https://github.com/heatkoemnak/trainiscord.git
 
-## Step 4: Pull pgAdmin 4 Image
-docker pull dpage/pgadmin4  
+### Step 2: Copy the environment from this project by using this command:
+cp .env
 
-## Step 5: Run pgAdmin 4 Container
-docker run --name pgadmin-tutorial -p 5050:80 -e PGADMIN_DEFAULT_EMAIL=admin@example.com -e PGADMIN_DEFAULT_PASSWORD=securepass -d dpage/pgadmin4  
+### Step 3: Add your config pgadmin and posgtres database on this .env file
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+DATABASE_URL=
+PGADMIN_DEFAULT_EMAIL=
+PGADMIN_DEFAULT_PASSWORD=
 
-## Step 6: Find PostgreSQL Container IP Address
-docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pg-tutorial  
+example:
 
-## Step 7: Connect to PostgreSQL via Terminal
-docker exec -it pg-tutorial psql -U postgres  
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=123456
+POSTGRES_DB=example_db
+DATABASE_URL=postgresql://postgres:123456@postgres:5432/example_db
 
-## Step 8: Switch to a Specific Database
-\c my_database  
+PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+PGADMIN_DEFAULT_PASSWORD=admin
 
-## Step 9: Query a Table in PostgreSQL
-SELECT * FROM users;  
+## Step 4: Build up project by running this following command:
+docker compose up --build
 
-Video Highlights:
-Install Docker and set up PostgreSQL.
-Configure pgAdmin for database management.
-Create and manage databases and tables.
-Query the database via terminal and GUI.
+## Step 5: Test api by open the browser and past this 
+http://localhost/docs
+
+## Step 6: Test pgAdmin
+http://localhost:5050
+
+then enter email and password from this value:
+PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+PGADMIN_DEFAULT_PASSWORD=admin
+
+## Step 7: Find PostgreSQL Container IP Address
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' example_db
+
+## Step 8: Connect to PostgreSQL via pgAdmin
+docker exec -it postgres psql -U postgres  
